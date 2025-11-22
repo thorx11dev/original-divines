@@ -56,8 +56,8 @@ const CloseSVG = ({
 );
 
 interface IpodNavigationProps {
-  onNavigateLeft: () => void;
-  onNavigateRight: () => void;
+  onNavigateLeft?: () => void;
+  onNavigateRight?: () => void;
 }
 
 export default function IpodNavigation({ onNavigateLeft, onNavigateRight }: IpodNavigationProps) {
@@ -138,6 +138,7 @@ export default function IpodNavigation({ onNavigateLeft, onNavigateRight }: Ipod
             onClick={onNavigateLeft}
             className="group pointer-events-auto p-[6px] outline-none focus-visible:outline-2 focus-visible:outline-black"
             aria-label="Navigate left"
+            disabled={!onNavigateLeft}
           >
             <div className="relative h-[30px] w-[30px] text-grey-20 transition-colors duration-300 group-hover:text-white">
               <ArrowSVG className="rotate-180" />
@@ -147,6 +148,7 @@ export default function IpodNavigation({ onNavigateLeft, onNavigateRight }: Ipod
             onClick={onNavigateRight}
             className="group pointer-events-auto p-[6px] outline-none focus-visible:outline-2 focus-visible:outline-black"
             aria-label="Navigate right"
+            disabled={!onNavigateRight}
           >
             <div className="relative h-[30px] w-[30px] text-grey-20 transition-colors duration-300 group-hover:text-white">
               <ArrowSVG />

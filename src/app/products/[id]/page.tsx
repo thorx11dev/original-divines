@@ -26,7 +26,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         <ProductDetailView product={product} />
       </main>
       <Header productName={product.name} />
-      <IpodNavigation onNavigateLeft={() => {}} onNavigateRight={() => {}} />
+      <IpodNavigation />
     </>
   );
 }
