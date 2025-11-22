@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect, SyntheticEvent } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 type Product = {
   id: string;
@@ -54,6 +55,7 @@ interface ProductCarouselProps {
 const ProductItem = ({ product, index, activeIndex, totalItems }: { product: Product; index: number; activeIndex: number; totalItems: number; }) => {
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const router = useRouter();
   
   const offset = index - activeIndex;
   const isActive = offset === 0;
@@ -82,7 +84,7 @@ const ProductItem = ({ product, index, activeIndex, totalItems }: { product: Pro
   }, [isActive]);
   
   const handleInteraction = () => {
-    console.log(`Open details for ${product.name}`);
+    router.push(`/products/${product.id}`);
   };
 
   return (
