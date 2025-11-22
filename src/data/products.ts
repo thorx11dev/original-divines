@@ -28,8 +28,8 @@ export type Product = {
 export const products: Product[] = [
   {
     id: 'tournee',
-    name: 'Tournée',
-    description: 'Affiche officielle de la tournée. Impression haute qualité sur papier premium.',
+    name: 'Tour',
+    description: 'Official tour poster. High quality print on premium paper.',
     category: 'accessories',
     media: {
       type: 'image',
@@ -40,8 +40,8 @@ export const products: Product[] = [
   },
   {
     id: 'tee-shirt-tour',
-    name: 'Tee shirt Tour',
-    description: 'Tee-shirt officiel de la tournée. 100% coton premium avec impression sérigraphie haute qualité.',
+    name: 'Tour T-shirt',
+    description: 'Official tour t-shirt. 100% premium cotton with high quality screen printing.',
     category: 'clothing',
     media: {
       type: 'video',
@@ -55,8 +55,8 @@ export const products: Product[] = [
   },
   {
     id: 'hoodie-tour',
-    name: 'Hoodie Tour',
-    description: 'Hoodie officiel de la tournée. Coton épais 400g/m² avec intérieur polaire. Coupe oversize confortable.',
+    name: 'Tour Hoodie',
+    description: 'Official tour hoodie. Heavy cotton 400g/m² with fleece interior. Comfortable oversize fit.',
     category: 'clothing',
     media: {
       type: 'video',
@@ -70,8 +70,8 @@ export const products: Product[] = [
   },
   {
     id: 'recording-session',
-    name: 'Recording session',
-    description: 'Photo exclusive des sessions d\'enregistrement. Tirage limité signé et numéroté.',
+    name: 'Recording Session',
+    description: 'Exclusive photo from recording sessions. Limited edition signed and numbered print.',
     category: 'accessories',
     media: {
       type: 'image',
@@ -83,7 +83,7 @@ export const products: Product[] = [
   {
     id: 'beyah',
     name: 'BĒYĀH',
-    description: 'Album BĒYĀH - Une œuvre intemporelle capturant l\'essence de l\'artiste.',
+    description: 'BĒYĀH Album - A timeless work capturing the essence of the artist.',
     category: 'album',
     media: {
       type: 'video',
@@ -100,8 +100,8 @@ export const products: Product[] = [
   },
   {
     id: 'k7',
-    name: 'K7',
-    description: 'Cassette collector K7. Format authentique vintage avec livret inclus.',
+    name: 'Cassette',
+    description: 'Collector cassette tape. Authentic vintage format with booklet included.',
     category: 'album',
     media: {
       type: 'video',
@@ -113,8 +113,8 @@ export const products: Product[] = [
   },
   {
     id: 'hoodie-velours',
-    name: 'Hoodie velours',
-    description: 'Hoodie en velours premium. Texture douce et luxueuse avec broderie détaillée.',
+    name: 'Velvet Hoodie',
+    description: 'Premium velvet hoodie. Soft and luxurious texture with detailed embroidery.',
     category: 'clothing',
     media: {
       type: 'video',
@@ -128,8 +128,8 @@ export const products: Product[] = [
   },
   {
     id: 'tee-shirt-reflectif',
-    name: 'Tee shirt reflectif',
-    description: 'Tee-shirt avec impression réflective. Design unique visible dans l\'obscurité.',
+    name: 'Reflective T-shirt',
+    description: 'T-shirt with reflective print. Unique design visible in the dark.',
     category: 'clothing',
     media: {
       type: 'video',
@@ -142,8 +142,8 @@ export const products: Product[] = [
   },
   {
     id: 'casquette-washed-black',
-    name: 'Casquette washed black',
-    description: 'Casquette effet délavé noir. Coton vintage avec ajustement réglable.',
+    name: 'Washed Black Cap',
+    description: 'Black washed effect cap. Vintage cotton with adjustable fit.',
     category: 'accessories',
     media: {
       type: 'video',
@@ -155,8 +155,8 @@ export const products: Product[] = [
   },
   {
     id: 'porte-clef',
-    name: 'Porte clef',
-    description: 'Porte-clés métallique collector. Design exclusif avec finition premium.',
+    name: 'Keychain',
+    description: 'Collector metal keychain. Exclusive design with premium finish.',
     category: 'accessories',
     media: {
       type: 'video',
@@ -169,7 +169,7 @@ export const products: Product[] = [
   {
     id: 'airpod-case',
     name: 'AIRPOD CASE',
-    description: 'Étui AirPods avec design exclusif. Protection complète en silicone premium.',
+    description: 'AirPods case with exclusive design. Complete protection in premium silicone.',
     category: 'accessories',
     media: {
       type: 'video',
@@ -181,8 +181,8 @@ export const products: Product[] = [
   },
   {
     id: 'affiche-embossee',
-    name: 'Affiche embossée',
-    description: 'Affiche avec effet gaufrage. Impression technique premium sur papier texturé.',
+    name: 'Embossed Poster',
+    description: 'Poster with embossed effect. Premium technical printing on textured paper.',
     category: 'accessories',
     media: {
       type: 'video',
@@ -194,8 +194,8 @@ export const products: Product[] = [
   },
   {
     id: 'jai-menti',
-    name: "J'AI MENTI.",
-    description: 'Album J\'AI MENTI - Le projet le plus personnel de l\'artiste.',
+    name: "I LIED.",
+    description: 'I LIED Album - The most personal project from the artist.',
     category: 'album',
     media: {
       type: 'video',
@@ -212,8 +212,8 @@ export const products: Product[] = [
   },
   {
     id: 'tee-shirt-beyah-blanc',
-    name: 'Tee shirt BĒYĀH blanc',
-    description: 'Tee-shirt blanc BĒYĀH. Coton premium avec sérigraphie haute définition.',
+    name: 'BĒYĀH White T-shirt',
+    description: 'BĒYĀH white t-shirt. Premium cotton with high definition screen printing.',
     category: 'clothing',
     media: {
       type: 'video',
@@ -226,8 +226,8 @@ export const products: Product[] = [
   },
   {
     id: 'tee-shirt-beyah-bleu',
-    name: 'TEE SHIRT BĒYĀH BLEU',
-    description: 'Tee-shirt bleu BĒYĀH. Édition limitée avec impression spéciale.',
+    name: 'BĒYĀH BLUE T-SHIRT',
+    description: 'BĒYĀH blue t-shirt. Limited edition with special print.',
     category: 'clothing',
     media: {
       type: 'video',
@@ -240,8 +240,8 @@ export const products: Product[] = [
   },
   {
     id: 'hoodie-beyah-noir',
-    name: 'HOODIE BĒYĀH NOIR',
-    description: 'Hoodie noir BĒYĀH. Design emblématique avec détails brodés premium.',
+    name: 'BĒYĀH BLACK HOODIE',
+    description: 'BĒYĀH black hoodie. Iconic design with premium embroidered details.',
     category: 'clothing',
     media: {
       type: 'video',
@@ -254,8 +254,8 @@ export const products: Product[] = [
   },
   {
     id: 'vinyle-qalf',
-    name: 'Vinyle QALF',
-    description: 'QALF en vinyle. Édition pressage haute qualité 180g avec pochette gatefold.',
+    name: 'QALF Vinyl',
+    description: 'QALF on vinyl. High quality 180g pressing edition with gatefold sleeve.',
     category: 'album',
     media: {
       type: 'image',
@@ -266,8 +266,8 @@ export const products: Product[] = [
   },
   {
     id: 'vinyle-ipseite',
-    name: 'Vinyle Ipséité',
-    description: 'Ipséité en vinyle. Double LP avec livret exclusif 16 pages.',
+    name: 'Ipséité Vinyl',
+    description: 'Ipséité on vinyl. Double LP with exclusive 16-page booklet.',
     category: 'album',
     media: {
       type: 'image',
@@ -278,8 +278,8 @@ export const products: Product[] = [
   },
   {
     id: 'vinyle-batterie-faible',
-    name: 'Vinyle Batterie Faible',
-    description: 'Batterie Faible en vinyle. Premier album mythique réédité en édition limitée.',
+    name: 'Batterie Faible Vinyl',
+    description: 'Batterie Faible on vinyl. Legendary first album reissued in limited edition.',
     category: 'album',
     media: {
       type: 'image',
@@ -290,8 +290,8 @@ export const products: Product[] = [
   },
   {
     id: 'vinyle-lithopedion',
-    name: 'Vinyle Lithopédion',
-    description: 'Lithopédion en vinyle. Album conceptuel sur pressage vinyle audiophile.',
+    name: 'Lithopédion Vinyl',
+    description: 'Lithopédion on vinyl. Conceptual album on audiophile vinyl pressing.',
     category: 'album',
     media: {
       type: 'image',
@@ -302,8 +302,8 @@ export const products: Product[] = [
   },
   {
     id: 'vinyle-ipseite-live',
-    name: 'Vinyle Ipséité LIVE',
-    description: 'Ipséité LIVE en vinyle. Enregistrement live exclusif en édition limitée.',
+    name: 'Ipséité LIVE Vinyl',
+    description: 'Ipséité LIVE on vinyl. Exclusive live recording in limited edition.',
     category: 'album',
     media: {
       type: 'video',
@@ -315,8 +315,8 @@ export const products: Product[] = [
   },
   {
     id: 'cd-qalf-infinity',
-    name: 'CD QALF Infinity',
-    description: 'QALF Infinity en CD. Réédition deluxe avec bonus tracks inédits.',
+    name: 'QALF Infinity CD',
+    description: 'QALF Infinity on CD. Deluxe reissue with unreleased bonus tracks.',
     category: 'album',
     media: {
       type: 'image',
@@ -327,8 +327,8 @@ export const products: Product[] = [
   },
   {
     id: 'cd-qalf',
-    name: 'CD QALF',
-    description: 'QALF en CD standard. L\'album qui a tout changé, format CD classique.',
+    name: 'QALF CD',
+    description: 'QALF on standard CD. The album that changed everything, classic CD format.',
     category: 'album',
     media: {
       type: 'image',
@@ -339,8 +339,8 @@ export const products: Product[] = [
   },
   {
     id: 'cd-lithopedion',
-    name: 'CD Lithopédion',
-    description: 'Lithopédion en CD. Projet introspectif avec livret illustré.',
+    name: 'Lithopédion CD',
+    description: 'Lithopédion on CD. Introspective project with illustrated booklet.',
     category: 'album',
     media: {
       type: 'image',
@@ -351,8 +351,8 @@ export const products: Product[] = [
   },
   {
     id: 'cd-ipseite',
-    name: 'CD Ipséité',
-    description: 'Ipséité en CD. Album conceptuel avec packaging collector.',
+    name: 'Ipséité CD',
+    description: 'Ipséité on CD. Conceptual album with collector packaging.',
     category: 'album',
     media: {
       type: 'image',
@@ -363,8 +363,8 @@ export const products: Product[] = [
   },
   {
     id: 'cd-batterie-faible',
-    name: 'CD Batterie Faible',
-    description: 'Batterie Faible en CD. Le premier album culte en format CD.',
+    name: 'Batterie Faible CD',
+    description: 'Batterie Faible on CD. The cult first album in CD format.',
     category: 'album',
     media: {
       type: 'image',
@@ -375,8 +375,8 @@ export const products: Product[] = [
   },
   {
     id: 'pack-cd',
-    name: 'Pack CD',
-    description: 'Pack complet des CDs. Tous les albums en coffret collector avec livret exclusif.',
+    name: 'CD Pack',
+    description: 'Complete CD pack. All albums in collector box set with exclusive booklet.',
     category: 'album',
     media: {
       type: 'video',
@@ -389,8 +389,8 @@ export const products: Product[] = [
   },
   {
     id: 'pack-vinyles',
-    name: 'Pack Vinyles',
-    description: 'Pack complet des vinyles. Collection complète en coffret numéroté limité.',
+    name: 'Vinyl Pack',
+    description: 'Complete vinyl pack. Full collection in limited numbered box set.',
     category: 'album',
     media: {
       type: 'video',
@@ -403,8 +403,8 @@ export const products: Product[] = [
   },
   {
     id: 'livre-qalf',
-    name: 'Livre QALF',
-    description: 'Livre QALF. Ouvrage illustré retraçant la création de l\'album légendaire.',
+    name: 'QALF Book',
+    description: 'QALF Book. Illustrated work tracing the creation of the legendary album.',
     category: 'book',
     media: {
       type: 'image',
@@ -415,8 +415,8 @@ export const products: Product[] = [
   },
   {
     id: 'livre-qalf-collector',
-    name: 'Livre QALF Collector',
-    description: 'Livre QALF Collector. Édition limitée signée avec contenu exclusif et photos inédites.',
+    name: 'QALF Collector Book',
+    description: 'QALF Collector Book. Limited signed edition with exclusive content and unreleased photos.',
     category: 'book',
     media: {
       type: 'image',

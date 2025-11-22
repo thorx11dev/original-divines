@@ -2,20 +2,25 @@
 
 import { useState, useRef, useEffect, SyntheticEvent } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { Product, ProductVariant } from '@/data/products';
 import { Plus, Minus } from 'lucide-react';
+import { useCart } from '@/contexts/cart-context';
 
 interface ProductDetailViewProps {
   product: Product;
 }
 
 export const ProductDetailView = ({ product }: ProductDetailViewProps) => {
+  const router = useRouter();
+  const { addItem } = useCart();
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
     product.variants?.[0] || null
   );
   const [selectedSize, setSelectedSize] = useState<string>(product.sizes?.[0] || '');
   const [quantity, setQuantity] = useState(1);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const currentPrice = selectedVariant?.price || product.defaultPrice;
@@ -38,13 +43,25 @@ export const ProductDetailView = ({ product }: ProductDetailViewProps) => {
   };
 
   const handleAddToCart = () => {
-    console.log('Add to cart:', {
-      product: product.id,
-      variant: selectedVariant?.id,
-      size: selectedSize,
-      quantity
+    setIsAdding(true);
+    
+    addItem({
+      productId: product.id,
+      name: product.name,
+      price: currentPrice,
+      quantity,
+      image: product.media.type === 'video' && product.media.poster 
+        ? product.media.poster 
+        : product.media.src,
+      variant: selectedVariant?.name,
+      size: selectedSize || undefined,
     });
-    // Cart logic will be implemented later
+
+    // Show brief feedback then redirect to cart
+    setTimeout(() => {
+      setIsAdding(false);
+      router.push('/cart');
+    }, 500);
   };
 
   return (
@@ -119,11 +136,11 @@ export const ProductDetailView = ({ product }: ProductDetailViewProps) => {
             <div>
               {isAvailable ? (
                 <div className="text-12px font-medium text-grey-40 uppercase">
-                  En stock ({currentStock} disponibles)
+                  In Stock ({currentStock} available)
                 </div>
               ) : (
                 <div className="text-12px font-bold text-destructive uppercase">
-                  En rupture de stock
+                  Out of Stock
                 </div>
               )}
             </div>
@@ -162,7 +179,7 @@ export const ProductDetailView = ({ product }: ProductDetailViewProps) => {
             {product.sizes && product.sizes.length > 0 && (
               <div className="flex flex-col gap-[12px]">
                 <label className="text-10px font-bold text-grey-40 uppercase">
-                  Taille
+                  Size
                 </label>
                 <div className="flex flex-wrap gap-[8px]">
                   {product.sizes.map((size) => (
@@ -188,7 +205,7 @@ export const ProductDetailView = ({ product }: ProductDetailViewProps) => {
             {/* Quantity Selector */}
             <div className="flex flex-col gap-[12px]">
               <label className="text-10px font-bold text-grey-40 uppercase">
-                Quantité
+                Quantity
               </label>
               <div className="flex items-center gap-[12px]">
                 <button
@@ -216,17 +233,17 @@ export const ProductDetailView = ({ product }: ProductDetailViewProps) => {
             {/* Add to Cart Button */}
             <button
               onClick={handleAddToCart}
-              disabled={!isAvailable}
+              disabled={!isAvailable || isAdding}
               className={`
                 w-full h-[56px] text-12px font-bold uppercase rounded-lg
                 transition-all duration-300
-                ${isAvailable
+                ${isAvailable && !isAdding
                   ? 'bg-primary text-primary-foreground hover:opacity-90'
                   : 'bg-grey-20 text-grey-40 cursor-not-allowed'
                 }
               `}
             >
-              {isAvailable ? 'Ajouter au panier' : 'Rupture de stock'}
+              {isAdding ? 'Adding...' : isAvailable ? 'Add to Cart' : 'Out of Stock'}
             </button>
 
             {/* Description */}

@@ -1,47 +1,14 @@
 'use client';
 
-import { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Plus, Minus, X } from 'lucide-react';
-
-interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-  image: string;
-  variant?: string;
-  size?: string;
-}
+import { useCart } from '@/contexts/cart-context';
 
 export const CartView = () => {
   const router = useRouter();
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    {
-      id: 'airpod-case',
-      name: 'AIRPOD CASE',
-      price: 29.99,
-      quantity: 1,
-      image: 'https://image.mux.com/vcxpI5VJy2Ml01fZVB7oQnCPYmm98qPN4101vxLpluz98/thumbnail.jpg?time=0',
-    },
-  ]);
+  const { items, updateQuantity, removeItem, subtotal, itemCount } = useCart();
 
-  const updateQuantity = (id: string, delta: number) => {
-    setCartItems(items =>
-      items.map(item =>
-        item.id === id
-          ? { ...item, quantity: Math.max(1, item.quantity + delta) }
-          : item
-      )
-    );
-  };
-
-  const removeItem = (id: string) => {
-    setCartItems(items => items.filter(item => item.id !== id));
-  };
-
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const shipping = 5.00;
   const total = subtotal + shipping;
 
@@ -58,7 +25,7 @@ export const CartView = () => {
           </h1>
         </div>
 
-        {cartItems.length === 0 ? (
+        {items.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-[80px]">
             <div className="text-[20px] font-medium text-grey-40 mb-[24px] uppercase">
               Your cart is empty
@@ -74,7 +41,7 @@ export const CartView = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-[40px]">
             {/* Cart Items */}
             <div className="lg:col-span-2 space-y-[24px]">
-              {cartItems.map(item => (
+              {items.map(item => (
                 <div
                   key={item.id}
                   className="flex gap-[16px] md:gap-[24px] p-[16px] md:p-[24px] bg-white rounded-lg border border-border"
@@ -128,7 +95,7 @@ export const CartView = () => {
                     {/* Quantity Controls */}
                     <div className="flex items-center gap-[12px] mt-[16px]">
                       <button
-                        onClick={() => updateQuantity(item.id, -1)}
+                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
                         disabled={item.quantity <= 1}
                         className="w-[36px] h-[36px] flex items-center justify-center bg-secondary rounded hover:bg-grey-20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="Decrease quantity"
@@ -139,7 +106,7 @@ export const CartView = () => {
                         {item.quantity}
                       </div>
                       <button
-                        onClick={() => updateQuantity(item.id, 1)}
+                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
                         className="w-[36px] h-[36px] flex items-center justify-center bg-secondary rounded hover:bg-grey-20 transition-colors"
                         aria-label="Increase quantity"
                       >
@@ -160,7 +127,7 @@ export const CartView = () => {
 
                 <div className="space-y-[16px] mb-[24px]">
                   <div className="flex justify-between text-[14px]">
-                    <span className="text-grey-40">Subtotal</span>
+                    <span className="text-grey-40">Subtotal ({itemCount} {itemCount === 1 ? 'item' : 'items'})</span>
                     <span className="font-medium text-foreground">€{subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-[14px]">

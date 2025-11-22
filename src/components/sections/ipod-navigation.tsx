@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { useCart } from "@/contexts/cart-context";
 
 const cn = (...classes: (string | undefined | null | false)[]) =>
   classes.filter(Boolean).join(" ");
@@ -58,13 +60,18 @@ const CloseSVG = ({
 interface IpodNavigationProps {
   onNavigateLeft?: () => void;
   onNavigateRight?: () => void;
+  isVisible?: boolean;
 }
 
-export default function IpodNavigation({ onNavigateLeft, onNavigateRight }: IpodNavigationProps) {
+export default function IpodNavigation({ onNavigateLeft, onNavigateRight, isVisible = true }: IpodNavigationProps) {
   const [isMenuOpen, setMenuOpen] = useState(false);
+  const { itemCount } = useCart();
 
   return (
-    <div className="pointer-events-none fixed bottom-0 left-0 z-[100] flex w-full justify-center">
+    <div 
+      className="pointer-events-none fixed bottom-0 left-0 z-[100] flex w-full justify-center transition-opacity duration-800 ease-expo-out"
+      style={{ opacity: isVisible ? 1 : 0 }}
+    >
       <div className="pointer-events-auto relative mb-[24px] aspect-square w-[180px] select-none">
         {/* Menu floating above */}
         <div
@@ -78,32 +85,34 @@ export default function IpodNavigation({ onNavigateLeft, onNavigateRight }: Ipod
               <a
                 aria-label="History"
                 className="group rounded-sm px-[10px] py-[7px] font-bold text-[10px] uppercase leading-none text-white transition-colors delay-100 duration-300 hover:text-black"
-                href="/"
+                href="/history"
               >
                 History
               </a>
               <a
                 aria-label="Calculator"
                 className="group rounded-sm px-[10px] py-[7px] font-bold text-[10px] uppercase leading-none text-white transition-colors delay-100 duration-300 hover:text-black"
-                href="/world"
+                href="/calculator"
               >
                 Calculator
               </a>
               <a
                 aria-label="Location"
                 className="group rounded-sm px-[10px] py-[7px] font-bold text-[10px] uppercase leading-none text-white transition-colors delay-100 duration-300 hover:text-black"
-                href="https://damso.com/billetterie"
+                href="/location"
               >
                 Location
               </a>
-              <button className="group relative py-[6px] pr-[8px]">
+              <Link href="/cart" className="group relative py-[6px] pr-[8px]">
                 <div className="relative flex h-[30px] w-[32px] items-end">
                   <CartSVG />
-                  <div className="absolute top-0 right-0 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-grey-40 font-medium text-[10px] leading-none text-white">
-                    <span>1</span>
-                  </div>
+                  {itemCount > 0 && (
+                    <div className="absolute top-0 right-0 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-grey-40 font-medium text-[10px] leading-none text-white">
+                      <span>{itemCount}</span>
+                    </div>
+                  )}
                 </div>
-              </button>
+              </Link>
             </div>
           </nav>
         </div>
