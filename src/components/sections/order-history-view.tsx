@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { ChevronDown, ChevronUp, Package } from 'lucide-react';
 
@@ -23,6 +23,15 @@ interface Order {
 
 export const OrderHistoryView = () => {
   const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set());
+  const [isVisible, setIsVisible] = useState(false);
+
+  // Entrance animation
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   const orders: Order[] = [
     {
@@ -129,14 +138,26 @@ export const OrderHistoryView = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-[1000px] px-[20px] md:px-[40px] pt-[120px] pb-[40px]">
-        <div className="mb-[40px]">
+        <div 
+          className="mb-[40px] transition-all duration-800 ease-expo-out"
+          style={{
+            opacity: isVisible ? 1 : 0,
+            transform: isVisible ? 'translateY(0)' : 'translateY(-20px)'
+          }}
+        >
           <h1 className="text-[32px] md:text-[40px] font-bold text-foreground leading-tight uppercase">
             Order History
           </h1>
         </div>
 
         {orders.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-[80px] bg-white rounded-lg border border-border">
+          <div 
+            className="flex flex-col items-center justify-center py-[80px] bg-white rounded-lg border border-border transition-all duration-800 ease-expo-out"
+            style={{
+              opacity: isVisible ? 1 : 0,
+              transform: isVisible ? 'scale(1)' : 'scale(0.95)'
+            }}
+          >
             <Package className="w-[64px] h-[64px] text-grey-40 mb-[16px]" />
             <div className="text-[20px] font-medium text-grey-40 mb-[8px] uppercase">
               No Orders
@@ -147,10 +168,15 @@ export const OrderHistoryView = () => {
           </div>
         ) : (
           <div className="space-y-[24px]">
-            {orders.map(order => (
+            {orders.map((order, idx) => (
               <div
                 key={order.id}
-                className="bg-white rounded-lg border border-border overflow-hidden"
+                className="bg-white rounded-lg border border-border overflow-hidden hover:shadow-md transition-all duration-500 ease-expo-out"
+                style={{
+                  opacity: isVisible ? 1 : 0,
+                  transform: isVisible ? 'translateX(0)' : 'translateX(-40px)',
+                  transitionDelay: `${idx * 100}ms`
+                }}
               >
                 {/* Order Header */}
                 <button
@@ -163,7 +189,7 @@ export const OrderHistoryView = () => {
                         {order.id}
                       </h3>
                       <span
-                        className={`px-[12px] py-[4px] text-10px font-bold uppercase rounded ${getStatusColor(
+                        className={`px-[12px] py-[4px] text-10px font-bold uppercase rounded transition-all duration-300 ${getStatusColor(
                           order.status
                         )}`}
                       >
@@ -178,7 +204,7 @@ export const OrderHistoryView = () => {
                       <span className="font-medium text-foreground">€{order.total.toFixed(2)}</span>
                     </div>
                   </div>
-                  <div className="ml-[16px]">
+                  <div className="ml-[16px] transition-transform duration-300">
                     {expandedOrders.has(order.id) ? (
                       <ChevronUp className="w-[24px] h-[24px] text-grey-40" />
                     ) : (
@@ -189,17 +215,17 @@ export const OrderHistoryView = () => {
 
                 {/* Order Details */}
                 {expandedOrders.has(order.id) && (
-                  <div className="border-t border-border p-[20px] md:p-[24px]">
+                  <div className="border-t border-border p-[20px] md:p-[24px] animate-in fade-in slide-in-from-top-2 duration-300">
                     {/* Order Items */}
                     <div className="space-y-[16px] mb-[24px]">
                       {order.items.map(item => (
                         <div key={item.id} className="flex gap-[16px]">
-                          <div className="relative w-[80px] h-[80px] flex-shrink-0 rounded overflow-hidden bg-grey-10">
+                          <div className="relative w-[80px] h-[80px] flex-shrink-0 rounded overflow-hidden bg-grey-10 group">
                             <Image
                               src={item.image}
                               alt={item.name}
                               fill
-                              className="object-cover"
+                              className="object-cover transition-transform duration-500 group-hover:scale-110"
                             />
                           </div>
                           <div className="flex-1 flex flex-col justify-center">

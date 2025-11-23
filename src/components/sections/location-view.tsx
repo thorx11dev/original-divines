@@ -1,10 +1,28 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+
 export const LocationView = () => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  // Entrance animation
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-[1400px] px-[20px] md:px-[40px] pt-[120px] pb-[40px]">
-        <div className="mb-[40px]">
+        <div 
+          className="mb-[40px] transition-all duration-800 ease-expo-out"
+          style={{
+            opacity: isVisible ? 1 : 0,
+            transform: isVisible ? 'translateY(0)' : 'translateY(-20px)'
+          }}
+        >
           <h1 className="text-[32px] md:text-[40px] font-bold text-foreground leading-tight uppercase">
             Our Location
           </h1>
@@ -12,7 +30,14 @@ export const LocationView = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-[40px]">
           {/* Address Information */}
-          <div className="p-[32px] bg-white rounded-lg border border-border">
+          <div 
+            className="p-[32px] bg-white rounded-lg border border-border hover:shadow-lg transition-all duration-500 ease-expo-out"
+            style={{
+              opacity: isVisible ? 1 : 0,
+              transform: isVisible ? 'translateX(0)' : 'translateX(-40px)',
+              transitionDelay: '100ms'
+            }}
+          >
             <h2 className="text-[24px] font-bold text-foreground uppercase mb-[24px]">
               Address
             </h2>
@@ -68,7 +93,7 @@ export const LocationView = () => {
                   href="https://maps.app.goo.gl/nMAqSyaYoiqCWtYg7"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center w-full h-[52px] bg-primary text-primary-foreground text-12px font-bold uppercase rounded-lg hover:opacity-90 transition-opacity"
+                  className="inline-flex items-center justify-center w-full h-[52px] bg-primary text-primary-foreground text-12px font-bold uppercase rounded-lg hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
                 >
                   Open in Google Maps
                 </a>
@@ -77,7 +102,14 @@ export const LocationView = () => {
           </div>
 
           {/* Google Maps Embed */}
-          <div className="relative h-[500px] lg:h-full min-h-[400px] rounded-lg overflow-hidden border border-border">
+          <div 
+            className="relative h-[500px] lg:h-full min-h-[400px] rounded-lg overflow-hidden border border-border shadow-md hover:shadow-xl transition-all duration-500 ease-expo-out"
+            style={{
+              opacity: isVisible ? 1 : 0,
+              transform: isVisible ? 'translateX(0)' : 'translateX(40px)',
+              transitionDelay: '200ms'
+            }}
+          >
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3398.8573572842624!2d72.31854!3d31.270833!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39226fd0fc8e0001%3A0x1234567890abcdef!2s78F9%2B6F5%2C%20Jhang%20Sadar%20Amir%20Colony%2C%20Jhang%2C%20Punjab%2C%20Pakistan!5e0!3m2!1sen!2s!4v1699999999999!5m2!1sen!2s"
               width="100%"
@@ -92,7 +124,14 @@ export const LocationView = () => {
         </div>
 
         {/* Additional Info Section */}
-        <div className="mt-[40px] p-[32px] bg-white rounded-lg border border-border">
+        <div 
+          className="mt-[40px] p-[32px] bg-white rounded-lg border border-border hover:shadow-lg transition-all duration-500 ease-expo-out"
+          style={{
+            opacity: isVisible ? 1 : 0,
+            transform: isVisible ? 'translateY(0)' : 'translateY(40px)',
+            transitionDelay: '300ms'
+          }}
+        >
           <h2 className="text-[24px] font-bold text-foreground uppercase mb-[16px]">
             How to Find Us
           </h2>

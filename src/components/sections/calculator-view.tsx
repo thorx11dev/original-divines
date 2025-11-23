@@ -1,12 +1,21 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export const CalculatorView = () => {
   const [display, setDisplay] = useState('0');
   const [previousValue, setPreviousValue] = useState<number | null>(null);
   const [operation, setOperation] = useState<string | null>(null);
   const [shouldResetDisplay, setShouldResetDisplay] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+
+  // Entrance animation
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleNumberClick = (num: string) => {
     if (shouldResetDisplay) {
@@ -113,7 +122,13 @@ export const CalculatorView = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-grey-10 to-background flex items-center justify-center px-[20px]">
-      <div className="w-full max-w-[480px] py-[120px]">
+      <div 
+        className="w-full max-w-[480px] py-[120px] transition-all duration-800 ease-expo-out"
+        style={{
+          opacity: isVisible ? 1 : 0,
+          transform: isVisible ? 'scale(1)' : 'scale(0.95)'
+        }}
+      >
         {/* Title */}
         <div className="mb-[32px] text-center">
           <h1 className="text-[36px] md:text-[44px] font-bold text-foreground leading-tight uppercase mb-[8px] bg-gradient-to-r from-primary via-grey-60 to-primary bg-clip-text text-transparent">

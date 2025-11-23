@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Plus, Minus, X } from 'lucide-react';
@@ -8,9 +9,18 @@ import { useCart } from '@/contexts/cart-context';
 export const CartView = () => {
   const router = useRouter();
   const { items, updateQuantity, removeItem, subtotal, itemCount } = useCart();
+  const [isVisible, setIsVisible] = useState(false);
 
   const shipping = 5.00;
   const total = subtotal + shipping;
+
+  // Entrance animation
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleCheckout = () => {
     router.push('/checkout');
@@ -19,20 +29,32 @@ export const CartView = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-[1200px] px-[20px] md:px-[40px] pt-[120px] pb-[40px]">
-        <div className="mb-[40px]">
+        <div 
+          className="mb-[40px] transition-all duration-800 ease-expo-out"
+          style={{
+            opacity: isVisible ? 1 : 0,
+            transform: isVisible ? 'translateY(0)' : 'translateY(-20px)'
+          }}
+        >
           <h1 className="text-[32px] md:text-[40px] font-bold text-foreground leading-tight uppercase">
             Cart
           </h1>
         </div>
 
         {items.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-[80px]">
+          <div 
+            className="flex flex-col items-center justify-center py-[80px] transition-all duration-800 ease-expo-out"
+            style={{
+              opacity: isVisible ? 1 : 0,
+              transform: isVisible ? 'scale(1)' : 'scale(0.95)'
+            }}
+          >
             <div className="text-[20px] font-medium text-grey-40 mb-[24px] uppercase">
               Your cart is empty
             </div>
             <button
               onClick={() => router.push('/')}
-              className="px-[32px] py-[16px] bg-primary text-primary-foreground text-12px font-bold uppercase rounded-lg hover:opacity-90 transition-opacity"
+              className="px-[32px] py-[16px] bg-primary text-primary-foreground text-12px font-bold uppercase rounded-lg hover:opacity-90 hover:scale-105 transition-all duration-300"
             >
               Continue Shopping
             </button>
@@ -41,18 +63,23 @@ export const CartView = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-[40px]">
             {/* Cart Items */}
             <div className="lg:col-span-2 space-y-[24px]">
-              {items.map(item => (
+              {items.map((item, idx) => (
                 <div
                   key={item.id}
-                  className="flex gap-[16px] md:gap-[24px] p-[16px] md:p-[24px] bg-white rounded-lg border border-border"
+                  className="flex gap-[16px] md:gap-[24px] p-[16px] md:p-[24px] bg-white rounded-lg border border-border hover:shadow-md transition-all duration-500 ease-expo-out"
+                  style={{
+                    opacity: isVisible ? 1 : 0,
+                    transform: isVisible ? 'translateX(0)' : 'translateX(-40px)',
+                    transitionDelay: `${idx * 100}ms`
+                  }}
                 >
                   {/* Product Image */}
-                  <div className="relative w-[100px] h-[100px] md:w-[120px] md:h-[120px] flex-shrink-0 rounded overflow-hidden bg-grey-10">
+                  <div className="relative w-[100px] h-[100px] md:w-[120px] md:h-[120px] flex-shrink-0 rounded overflow-hidden bg-grey-10 group">
                     <Image
                       src={item.image}
                       alt={item.name}
                       fill
-                      className="object-cover"
+                      className="object-cover transition-transform duration-500 group-hover:scale-110"
                     />
                   </div>
 
@@ -65,7 +92,7 @@ export const CartView = () => {
                         </h3>
                         <button
                           onClick={() => removeItem(item.id)}
-                          className="text-grey-40 hover:text-foreground transition-colors p-[4px]"
+                          className="text-grey-40 hover:text-destructive hover:rotate-90 transition-all duration-300 p-[4px]"
                           aria-label="Remove item"
                         >
                           <X className="w-[20px] h-[20px]" />
@@ -97,17 +124,17 @@ export const CartView = () => {
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
                         disabled={item.quantity <= 1}
-                        className="w-[36px] h-[36px] flex items-center justify-center bg-secondary rounded hover:bg-grey-20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-[36px] h-[36px] flex items-center justify-center bg-secondary rounded hover:bg-grey-20 hover:scale-110 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                         aria-label="Decrease quantity"
                       >
                         <Minus className="w-[14px] h-[14px]" />
                       </button>
-                      <div className="w-[50px] h-[36px] flex items-center justify-center bg-white border border-border rounded text-[14px] font-medium">
+                      <div className="w-[50px] h-[36px] flex items-center justify-center bg-white border border-border rounded text-[14px] font-medium transition-all duration-300">
                         {item.quantity}
                       </div>
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        className="w-[36px] h-[36px] flex items-center justify-center bg-secondary rounded hover:bg-grey-20 transition-colors"
+                        className="w-[36px] h-[36px] flex items-center justify-center bg-secondary rounded hover:bg-grey-20 hover:scale-110 transition-all duration-300"
                         aria-label="Increase quantity"
                       >
                         <Plus className="w-[14px] h-[14px]" />
@@ -120,7 +147,14 @@ export const CartView = () => {
 
             {/* Order Summary */}
             <div className="lg:col-span-1">
-              <div className="sticky top-[120px] p-[24px] bg-white rounded-lg border border-border">
+              <div 
+                className="sticky top-[120px] p-[24px] bg-white rounded-lg border border-border transition-all duration-800 ease-expo-out hover:shadow-lg"
+                style={{
+                  opacity: isVisible ? 1 : 0,
+                  transform: isVisible ? 'translateY(0)' : 'translateY(40px)',
+                  transitionDelay: '200ms'
+                }}
+              >
                 <h2 className="text-[20px] font-bold text-foreground uppercase mb-[24px]">
                   Summary
                 </h2>
@@ -144,14 +178,14 @@ export const CartView = () => {
 
                 <button
                   onClick={handleCheckout}
-                  className="w-full h-[52px] bg-primary text-primary-foreground text-12px font-bold uppercase rounded-lg hover:opacity-90 transition-opacity"
+                  className="w-full h-[52px] bg-primary text-primary-foreground text-12px font-bold uppercase rounded-lg hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
                 >
                   Proceed to Checkout
                 </button>
 
                 <button
                   onClick={() => router.push('/')}
-                  className="w-full mt-[12px] h-[52px] bg-secondary text-secondary-foreground text-12px font-bold uppercase rounded-lg hover:bg-grey-20 transition-colors"
+                  className="w-full mt-[12px] h-[52px] bg-secondary text-secondary-foreground text-12px font-bold uppercase rounded-lg hover:bg-grey-20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
                 >
                   Continue Shopping
                 </button>

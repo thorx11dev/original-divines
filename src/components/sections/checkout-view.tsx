@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useCart } from '@/contexts/cart-context';
@@ -12,8 +12,16 @@ export const CheckoutView = () => {
     phone: '',
     address: '',
   });
-
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+
+  // Entrance animation
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData(prev => ({
@@ -26,10 +34,8 @@ export const CheckoutView = () => {
     e.preventDefault();
     setIsProcessing(true);
     
-    // Simulate payment processing
     await new Promise(resolve => setTimeout(resolve, 2000));
     
-    // Clear cart after successful order
     clearCart();
     setIsProcessing(false);
     router.push('/history');
@@ -38,17 +44,22 @@ export const CheckoutView = () => {
   const shipping = 5.00;
   const total = subtotal + shipping;
 
-  // Redirect if cart is empty
   if (items.length === 0) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
+        <div 
+          className="text-center transition-all duration-800 ease-expo-out"
+          style={{
+            opacity: isVisible ? 1 : 0,
+            transform: isVisible ? 'scale(1)' : 'scale(0.95)'
+          }}
+        >
           <h2 className="text-[24px] font-bold text-foreground uppercase mb-[16px]">
             Your cart is empty
           </h2>
           <button
             onClick={() => router.push('/')}
-            className="px-[32px] py-[16px] bg-primary text-primary-foreground text-12px font-bold uppercase rounded-lg hover:opacity-90 transition-opacity"
+            className="px-[32px] py-[16px] bg-primary text-primary-foreground text-12px font-bold uppercase rounded-lg hover:opacity-90 hover:scale-105 transition-all duration-300"
           >
             Continue Shopping
           </button>
@@ -60,7 +71,13 @@ export const CheckoutView = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-[1200px] px-[20px] md:px-[40px] pt-[120px] pb-[40px]">
-        <div className="mb-[40px]">
+        <div 
+          className="mb-[40px] transition-all duration-800 ease-expo-out"
+          style={{
+            opacity: isVisible ? 1 : 0,
+            transform: isVisible ? 'translateY(0)' : 'translateY(-20px)'
+          }}
+        >
           <h1 className="text-[32px] md:text-[40px] font-bold text-foreground leading-tight uppercase">
             Checkout
           </h1>
@@ -70,7 +87,14 @@ export const CheckoutView = () => {
           {/* Checkout Form */}
           <div className="lg:col-span-2 space-y-[32px]">
             {/* Delivery Information */}
-            <div className="p-[24px] bg-white rounded-lg border border-border">
+            <div 
+              className="p-[24px] bg-white rounded-lg border border-border transition-all duration-800 ease-expo-out hover:shadow-md"
+              style={{
+                opacity: isVisible ? 1 : 0,
+                transform: isVisible ? 'translateX(0)' : 'translateX(-40px)',
+                transitionDelay: '100ms'
+              }}
+            >
               <h2 className="text-[18px] font-bold text-foreground uppercase mb-[24px]">
                 Delivery Information
               </h2>
@@ -86,7 +110,7 @@ export const CheckoutView = () => {
                     value={formData.phone}
                     onChange={handleChange}
                     required
-                    className="w-full h-[48px] px-[16px] bg-background border border-border rounded text-[14px] focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full h-[48px] px-[16px] bg-background border border-border rounded text-[14px] focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
                     placeholder="+1 (555) 000-0000"
                   />
                 </div>
@@ -101,7 +125,7 @@ export const CheckoutView = () => {
                     onChange={handleChange}
                     required
                     rows={4}
-                    className="w-full px-[16px] py-[12px] bg-background border border-border rounded text-[14px] focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                    className="w-full px-[16px] py-[12px] bg-background border border-border rounded text-[14px] focus:outline-none focus:ring-2 focus:ring-primary resize-none transition-all duration-300"
                     placeholder="Enter your complete delivery address"
                   />
                 </div>
@@ -111,7 +135,14 @@ export const CheckoutView = () => {
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="sticky top-[120px] p-[24px] bg-white rounded-lg border border-border">
+            <div 
+              className="sticky top-[120px] p-[24px] bg-white rounded-lg border border-border transition-all duration-800 ease-expo-out hover:shadow-lg"
+              style={{
+                opacity: isVisible ? 1 : 0,
+                transform: isVisible ? 'translateY(0)' : 'translateY(40px)',
+                transitionDelay: '200ms'
+              }}
+            >
               <h2 className="text-[20px] font-bold text-foreground uppercase mb-[24px]">
                 Order Summary
               </h2>
@@ -120,12 +151,12 @@ export const CheckoutView = () => {
               <div className="mb-[24px] pb-[24px] border-b border-border max-h-[300px] overflow-y-auto">
                 {items.map(item => (
                   <div key={item.id} className="flex gap-[12px] mb-[16px] last:mb-0">
-                    <div className="relative w-[60px] h-[60px] flex-shrink-0 rounded overflow-hidden bg-grey-10">
+                    <div className="relative w-[60px] h-[60px] flex-shrink-0 rounded overflow-hidden bg-grey-10 group">
                       <Image
                         src={item.image}
                         alt={item.name}
                         fill
-                        className="object-cover"
+                        className="object-cover transition-transform duration-500 group-hover:scale-110"
                       />
                     </div>
                     <div className="flex-1">
@@ -168,7 +199,7 @@ export const CheckoutView = () => {
               <button
                 type="submit"
                 disabled={isProcessing}
-                className="w-full h-[52px] bg-primary text-primary-foreground text-12px font-bold uppercase rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full h-[52px] bg-primary text-primary-foreground text-12px font-bold uppercase rounded-lg hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isProcessing ? 'Processing...' : 'Complete Order'}
               </button>
@@ -176,7 +207,7 @@ export const CheckoutView = () => {
               <button
                 type="button"
                 onClick={() => router.push('/cart')}
-                className="w-full mt-[12px] h-[52px] bg-secondary text-secondary-foreground text-12px font-bold uppercase rounded-lg hover:bg-grey-20 transition-colors"
+                className="w-full mt-[12px] h-[52px] bg-secondary text-secondary-foreground text-12px font-bold uppercase rounded-lg hover:bg-grey-20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
               >
                 Back to Cart
               </button>
