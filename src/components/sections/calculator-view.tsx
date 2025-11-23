@@ -9,7 +9,6 @@ export const CalculatorView = () => {
   const [shouldResetDisplay, setShouldResetDisplay] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
-  // Entrance animation
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsVisible(true);
@@ -102,12 +101,12 @@ export const CalculatorView = () => {
     className?: string; 
     variant?: 'default' | 'operation' | 'equals' | 'clear';
   }) => {
-    const baseClasses = 'h-[70px] md:h-[80px] text-[20px] md:text-[24px] font-bold uppercase rounded-lg transition-all duration-300 hover:scale-105 active:scale-95';
+    const baseClasses = 'h-[60px] text-[20px] font-bold rounded-lg transition-all duration-200 active:scale-95';
     const variantClasses = {
-      default: 'bg-white border-2 border-border text-foreground hover:border-grey-40 shadow-sm',
-      operation: 'bg-gradient-to-b from-secondary to-grey-10 text-foreground hover:from-grey-10 hover:to-secondary shadow-md',
-      equals: 'bg-gradient-to-b from-primary to-black text-primary-foreground hover:from-black hover:to-primary shadow-lg',
-      clear: 'bg-gradient-to-b from-destructive to-red-600 text-destructive-foreground hover:from-red-600 hover:to-destructive shadow-lg',
+      default: 'bg-white border border-border text-foreground hover:bg-grey-10',
+      operation: 'bg-grey-20 text-foreground hover:bg-grey-40 hover:text-white',
+      equals: 'bg-primary text-primary-foreground hover:opacity-90',
+      clear: 'bg-destructive text-destructive-foreground hover:opacity-90',
     };
 
     return (
@@ -121,39 +120,31 @@ export const CalculatorView = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-grey-10 to-background flex items-center justify-center px-[20px]">
+    <div className="fixed inset-0 bg-background flex items-center justify-center px-[20px] pt-[100px] pb-[20px]">
       <div 
-        className="w-full max-w-[480px] py-[120px] transition-all duration-800 ease-expo-out"
+        className="w-full max-w-[400px] transition-all duration-800 ease-expo-out"
         style={{
           opacity: isVisible ? 1 : 0,
           transform: isVisible ? 'scale(1)' : 'scale(0.95)'
         }}
       >
-        {/* Title */}
-        <div className="mb-[32px] text-center">
-          <h1 className="text-[36px] md:text-[44px] font-bold text-foreground leading-tight uppercase mb-[8px] bg-gradient-to-r from-primary via-grey-60 to-primary bg-clip-text text-transparent">
-            Calculator
-          </h1>
-          <p className="text-[12px] text-grey-40 uppercase tracking-wider">Professional Computing Tool</p>
-        </div>
-
-        <div className="bg-white rounded-2xl border-2 border-border p-[24px] md:p-[32px] shadow-2xl">
+        <div className="bg-white rounded-2xl border border-border p-[20px] shadow-lg">
           {/* Display */}
-          <div className="mb-[24px] p-[24px] bg-gradient-to-br from-background to-grey-10 rounded-xl border-2 border-border shadow-inner">
+          <div className="mb-[20px] p-[20px] bg-background rounded-xl border border-border">
             <div className="text-right">
               {operation && previousValue !== null && (
-                <div className="text-[14px] md:text-[16px] text-grey-40 mb-[8px] font-medium">
+                <div className="text-[14px] text-grey-40 mb-[4px] font-medium h-[20px]">
                   {previousValue} {operation}
                 </div>
               )}
-              <div className="text-[40px] md:text-[48px] font-bold text-foreground break-all leading-tight min-h-[60px] flex items-center justify-end">
+              <div className="text-[36px] font-bold text-foreground break-all leading-tight min-h-[50px] flex items-center justify-end">
                 {display}
               </div>
             </div>
           </div>
 
           {/* Calculator Grid */}
-          <div className="grid grid-cols-4 gap-[12px] md:gap-[16px]">
+          <div className="grid grid-cols-4 gap-[10px]">
             {/* Row 1 */}
             <Button onClick={handleClear} variant="clear" className="col-span-2">
               AC
@@ -198,13 +189,6 @@ export const CalculatorView = () => {
               =
             </Button>
           </div>
-        </div>
-
-        {/* Footer */}
-        <div className="mt-[24px] text-center">
-          <p className="text-[10px] text-grey-40 uppercase tracking-wider">
-            Powered by DAMSO.COM
-          </p>
         </div>
       </div>
     </div>

@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 export const LocationView = () => {
   const [isVisible, setIsVisible] = useState(false);
 
-  // Entrance animation
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsVisible(true);
@@ -58,23 +57,37 @@ export const LocationView = () => {
                 <div className="text-10px font-bold text-grey-40 uppercase mb-[8px]">
                   Opening Hours
                 </div>
-                <div className="text-[16px] text-foreground leading-relaxed">
-                  Saturday: 1:00 PM - 12:00 AM<br />
-                  Sunday: 1:00 PM - 4:00 AM<br />
-                  Monday: 1:00 PM - 12:00 AM<br />
-                  Tuesday: 1:00 PM - 12:00 AM<br />
-                  Wednesday: 1:00 PM - 12:00 AM<br />
-                  Thursday: 1:00 PM - 12:00 AM<br />
-                  Friday: 1:00 PM - 12:00 AM
-                </div>
-              </div>
-
-              <div>
-                <div className="text-10px font-bold text-grey-40 uppercase mb-[8px]">
-                  Price Range
-                </div>
-                <div className="text-[16px] text-foreground leading-relaxed">
-                  Rs 1-1,000 per person
+                <div className="bg-gradient-to-br from-grey-10 to-white p-[20px] rounded-lg border border-border">
+                  <div className="space-y-[8px] text-[14px]">
+                    <div className="flex justify-between items-center py-[6px] border-b border-grey-10">
+                      <span className="font-medium text-foreground">Saturday</span>
+                      <span className="text-grey-60">1:00 PM - 12:00 AM</span>
+                    </div>
+                    <div className="flex justify-between items-center py-[6px] border-b border-grey-10">
+                      <span className="font-medium text-foreground">Sunday</span>
+                      <span className="text-grey-60">1:00 PM - 4:00 AM</span>
+                    </div>
+                    <div className="flex justify-between items-center py-[6px] border-b border-grey-10">
+                      <span className="font-medium text-foreground">Monday</span>
+                      <span className="text-grey-60">1:00 PM - 12:00 AM</span>
+                    </div>
+                    <div className="flex justify-between items-center py-[6px] border-b border-grey-10">
+                      <span className="font-medium text-foreground">Tuesday</span>
+                      <span className="text-grey-60">1:00 PM - 12:00 AM</span>
+                    </div>
+                    <div className="flex justify-between items-center py-[6px] border-b border-grey-10">
+                      <span className="font-medium text-foreground">Wednesday</span>
+                      <span className="text-grey-60">1:00 PM - 12:00 AM</span>
+                    </div>
+                    <div className="flex justify-between items-center py-[6px] border-b border-grey-10">
+                      <span className="font-medium text-foreground">Thursday</span>
+                      <span className="text-grey-60">1:00 PM - 12:00 AM</span>
+                    </div>
+                    <div className="flex justify-between items-center py-[6px]">
+                      <span className="font-medium text-foreground">Friday</span>
+                      <span className="text-grey-60">1:00 PM - 12:00 AM</span>
+                    </div>
+                  </div>
                 </div>
               </div>
 

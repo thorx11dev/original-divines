@@ -9,6 +9,7 @@ export const CheckoutView = () => {
   const router = useRouter();
   const { items, subtotal, clearCart } = useCart();
   const [formData, setFormData] = useState({
+    name: '',
     phone: '',
     address: '',
   });
@@ -99,6 +100,21 @@ export const CheckoutView = () => {
                 Delivery Information
               </h2>
               <div className="space-y-[16px]">
+                <div>
+                  <label htmlFor="name" className="block text-10px font-bold text-grey-40 uppercase mb-[8px]">
+                    Name
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                    className="w-full h-[48px] px-[16px] bg-background border border-border rounded text-[14px] focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
+                    placeholder="Your full name"
+                  />
+                </div>
                 <div>
                   <label htmlFor="phone" className="block text-10px font-bold text-grey-40 uppercase mb-[8px]">
                     Phone Number
