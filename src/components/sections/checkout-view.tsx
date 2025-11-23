@@ -4,17 +4,32 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useCart } from '@/contexts/cart-context';
+import { useUser } from '@/contexts/user-context';
 
 export const CheckoutView = () => {
   const router = useRouter();
   const { items, subtotal, clearCart } = useCart();
+  const { user } = useUser();
+  
   const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-    address: '',
+    name: user?.name || '',
+    phone: user?.phone || '',
+    address: user?.address || '',
   });
+  
+  const [verificationStep, setVerificationStep] = useState<'form' | 'verify'>('form');
+  const [verificationCode, setVerificationCode] = useState('');
+  const [sentCode, setSentCode] = useState('');
+  const [orderId, setOrderId] = useState<number | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isSendingCode, setIsSendingCode] = useState(false);
+  const [error, setError] = useState('');
+  const [canResend, setCanResend] = useState(false);
+  const [resendTimer, setResendTimer] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
+
+  const shipping = 5.00;
+  const total = subtotal + shipping;
 
   // Entrance animation
   useEffect(() => {
@@ -24,6 +39,33 @@ export const CheckoutView = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  // Update form when user data changes
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        name: user.name,
+        phone: user.phone,
+        address: user.address,
+      });
+    }
+  }, [user]);
+
+  // Resend timer
+  useEffect(() => {
+    if (resendTimer > 0) {
+      const interval = setInterval(() => {
+        setResendTimer(prev => {
+          if (prev <= 1) {
+            setCanResend(true);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [resendTimer]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData(prev => ({
       ...prev,
@@ -31,19 +73,144 @@ export const CheckoutView = () => {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsProcessing(true);
-    
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    clearCart();
-    setIsProcessing(false);
-    router.push('/history');
+  const createOrder = async (): Promise<number | null> => {
+    try {
+      const orderNumber = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+      
+      const orderData = {
+        customerName: formData.name,
+        customerPhone: formData.phone,
+        customerAddress: formData.address,
+        orderNumber,
+        totalAmount: total,
+        items: items.map(item => ({
+          productId: parseInt(item.productId) || 0,
+          productName: item.name,
+          variant: item.variant || null,
+          size: item.size || null,
+          quantity: item.quantity,
+          price: item.price,
+          imageUrl: item.image,
+        })),
+      };
+
+      const response = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return data.id;
+      }
+      
+      return null;
+    } catch (err) {
+      console.error('Failed to create order:', err);
+      return null;
+    }
   };
 
-  const shipping = 5.00;
-  const total = subtotal + shipping;
+  const sendVerificationCode = async () => {
+    setError('');
+    setIsSendingCode(true);
+
+    try {
+      const response = await fetch('/api/verification/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: formData.phone }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setSentCode(data.code); // For testing purposes
+        setCanResend(false);
+        setResendTimer(60);
+        return true;
+      } else {
+        setError('Failed to send verification code. Please try again.');
+        return false;
+      }
+    } catch (err) {
+      setError('An error occurred. Please try again.');
+      return false;
+    } finally {
+      setIsSendingCode(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setIsProcessing(true);
+
+    try {
+      // Create the order first
+      const newOrderId = await createOrder();
+      
+      if (!newOrderId) {
+        setError('Failed to create order. Please try again.');
+        setIsProcessing(false);
+        return;
+      }
+
+      setOrderId(newOrderId);
+
+      // Send verification code
+      const codeSent = await sendVerificationCode();
+      
+      if (codeSent) {
+        setVerificationStep('verify');
+      }
+    } catch (err) {
+      setError('An error occurred. Please try again.');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleVerifyCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setIsProcessing(true);
+
+    try {
+      const response = await fetch('/api/verification/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: formData.phone,
+          code: verificationCode,
+          orderId: orderId,
+        }),
+      });
+
+      if (response.ok) {
+        clearCart();
+        router.push('/history');
+      } else {
+        const data = await response.json();
+        setError(data.error || 'Invalid verification code. Please try again.');
+      }
+    } catch (err) {
+      setError('An error occurred. Please try again.');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    if (!canResend) return;
+    
+    setError('');
+    const success = await sendVerificationCode();
+    
+    if (success) {
+      setVerificationCode('');
+    }
+  };
 
   if (items.length === 0) {
     return (
@@ -84,69 +251,162 @@ export const CheckoutView = () => {
           </h1>
         </div>
 
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-[40px]">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-[40px]">
           {/* Checkout Form */}
           <div className="lg:col-span-2 space-y-[32px]">
-            {/* Delivery Information */}
-            <div 
-              className="p-[24px] bg-white rounded-lg border border-border transition-all duration-800 ease-expo-out hover:shadow-md"
-              style={{
-                opacity: isVisible ? 1 : 0,
-                transform: isVisible ? 'translateX(0)' : 'translateX(-40px)',
-                transitionDelay: '100ms'
-              }}
-            >
-              <h2 className="text-[18px] font-bold text-foreground uppercase mb-[24px]">
-                Delivery Information
-              </h2>
-              <div className="space-y-[16px]">
-                <div>
-                  <label htmlFor="name" className="block text-10px font-bold text-grey-40 uppercase mb-[8px]">
-                    Name
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    className="w-full h-[48px] px-[16px] bg-background border border-border rounded text-[14px] focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
-                    placeholder="Your full name"
-                  />
+            {verificationStep === 'form' ? (
+              <form onSubmit={handleSubmit}>
+                {/* Delivery Information */}
+                <div 
+                  className="p-[24px] bg-white rounded-lg border border-border transition-all duration-800 ease-expo-out hover:shadow-md"
+                  style={{
+                    opacity: isVisible ? 1 : 0,
+                    transform: isVisible ? 'translateX(0)' : 'translateX(-40px)',
+                    transitionDelay: '100ms'
+                  }}
+                >
+                  <h2 className="text-[18px] font-bold text-foreground uppercase mb-[24px]">
+                    Delivery Information
+                  </h2>
+                  <div className="space-y-[16px]">
+                    <div>
+                      <label htmlFor="name" className="block text-10px font-bold text-grey-40 uppercase mb-[8px]">
+                        Name
+                      </label>
+                      <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        required
+                        className="w-full h-[48px] px-[16px] bg-background border border-border rounded text-[14px] focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
+                        placeholder="Your full name"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="phone" className="block text-10px font-bold text-grey-40 uppercase mb-[8px]">
+                        Phone Number
+                      </label>
+                      <input
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        required
+                        className="w-full h-[48px] px-[16px] bg-background border border-border rounded text-[14px] focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
+                        placeholder="+1 (555) 000-0000"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="address" className="block text-10px font-bold text-grey-40 uppercase mb-[8px]">
+                        Delivery Address
+                      </label>
+                      <textarea
+                        id="address"
+                        name="address"
+                        value={formData.address}
+                        onChange={handleChange}
+                        required
+                        rows={4}
+                        className="w-full px-[16px] py-[12px] bg-background border border-border rounded text-[14px] focus:outline-none focus:ring-2 focus:ring-primary resize-none transition-all duration-300"
+                        placeholder="Enter your complete delivery address"
+                      />
+                    </div>
+                  </div>
+
+                  {error && (
+                    <div className="mt-[16px] p-[16px] bg-red-50 border border-red-200 rounded text-[14px] text-red-700">
+                      {error}
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={isProcessing}
+                    className="w-full mt-[24px] h-[52px] bg-primary text-primary-foreground text-12px font-bold uppercase rounded-lg hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isProcessing ? 'Processing...' : 'Continue to Verification'}
+                  </button>
                 </div>
-                <div>
-                  <label htmlFor="phone" className="block text-10px font-bold text-grey-40 uppercase mb-[8px]">
-                    Phone Number
-                  </label>
-                  <input
-                    type="tel"
-                    id="phone"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    required
-                    className="w-full h-[48px] px-[16px] bg-background border border-border rounded text-[14px] focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
-                    placeholder="+1 (555) 000-0000"
-                  />
+              </form>
+            ) : (
+              <form onSubmit={handleVerifyCode}>
+                {/* Verification Step */}
+                <div 
+                  className="p-[24px] bg-white rounded-lg border border-border transition-all duration-800 ease-expo-out hover:shadow-md"
+                  style={{
+                    opacity: isVisible ? 1 : 0,
+                    transform: isVisible ? 'translateX(0)' : 'translateX(-40px)',
+                    transitionDelay: '100ms'
+                  }}
+                >
+                  <h2 className="text-[18px] font-bold text-foreground uppercase mb-[16px]">
+                    Verify Your Phone
+                  </h2>
+                  <p className="text-[14px] text-grey-40 mb-[24px]">
+                    We've sent a verification code to <strong>{formData.phone}</strong>. Please enter it below to complete your order.
+                  </p>
+
+                  {/* For testing - show the code */}
+                  {sentCode && (
+                    <div className="mb-[16px] p-[16px] bg-blue-50 border border-blue-200 rounded">
+                      <div className="text-[12px] text-blue-600 font-medium uppercase mb-[4px]">
+                        Test Mode - Your Code:
+                      </div>
+                      <div className="text-[24px] font-bold text-blue-900 tracking-wider">
+                        {sentCode}
+                      </div>
+                    </div>
+                  )}
+
+                  <div>
+                    <label htmlFor="verificationCode" className="block text-10px font-bold text-grey-40 uppercase mb-[8px]">
+                      Verification Code
+                    </label>
+                    <input
+                      type="text"
+                      id="verificationCode"
+                      value={verificationCode}
+                      onChange={(e) => setVerificationCode(e.target.value)}
+                      required
+                      maxLength={6}
+                      placeholder="Enter 6-digit code"
+                      className="w-full h-[48px] px-[16px] bg-background border border-border rounded text-[14px] text-center tracking-widest font-bold focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
+                    />
+                  </div>
+
+                  {error && (
+                    <div className="mt-[16px] p-[16px] bg-red-50 border border-red-200 rounded text-[14px] text-red-700">
+                      {error}
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={isProcessing || verificationCode.length !== 6}
+                    className="w-full mt-[24px] h-[52px] bg-primary text-primary-foreground text-12px font-bold uppercase rounded-lg hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isProcessing ? 'Verifying...' : 'Verify & Complete Order'}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleResendCode}
+                    disabled={!canResend || isSendingCode}
+                    className="w-full mt-[12px] h-[52px] bg-secondary text-secondary-foreground text-12px font-bold uppercase rounded-lg hover:bg-grey-20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSendingCode 
+                      ? 'Sending...' 
+                      : canResend 
+                      ? 'Resend Code' 
+                      : `Resend in ${resendTimer}s`
+                    }
+                  </button>
                 </div>
-                <div>
-                  <label htmlFor="address" className="block text-10px font-bold text-grey-40 uppercase mb-[8px]">
-                    Delivery Address
-                  </label>
-                  <textarea
-                    id="address"
-                    name="address"
-                    value={formData.address}
-                    onChange={handleChange}
-                    required
-                    rows={4}
-                    className="w-full px-[16px] py-[12px] bg-background border border-border rounded text-[14px] focus:outline-none focus:ring-2 focus:ring-primary resize-none transition-all duration-300"
-                    placeholder="Enter your complete delivery address"
-                  />
-                </div>
-              </div>
-            </div>
+              </form>
+            )}
           </div>
 
           {/* Order Summary */}
@@ -212,24 +472,18 @@ export const CheckoutView = () => {
                 </div>
               </div>
 
-              <button
-                type="submit"
-                disabled={isProcessing}
-                className="w-full h-[52px] bg-primary text-primary-foreground text-12px font-bold uppercase rounded-lg hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isProcessing ? 'Processing...' : 'Complete Order'}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => router.push('/cart')}
-                className="w-full mt-[12px] h-[52px] bg-secondary text-secondary-foreground text-12px font-bold uppercase rounded-lg hover:bg-grey-20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
-              >
-                Back to Cart
-              </button>
+              {verificationStep === 'form' && (
+                <button
+                  type="button"
+                  onClick={() => router.push('/cart')}
+                  className="w-full h-[52px] bg-secondary text-secondary-foreground text-12px font-bold uppercase rounded-lg hover:bg-grey-20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
+                >
+                  Back to Cart
+                </button>
+              )}
             </div>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );
