@@ -1,13 +1,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export const CalculatorView = () => {
+  const router = useRouter();
   const [display, setDisplay] = useState('0');
   const [previousValue, setPreviousValue] = useState<number | null>(null);
   const [operation, setOperation] = useState<string | null>(null);
   const [shouldResetDisplay, setShouldResetDisplay] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  
+  // Team access tracking - track the full expression
+  const [fullExpression, setFullExpression] = useState('');
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -16,12 +21,29 @@ export const CalculatorView = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  // Check for team portal access code
+  const checkTeamPortalAccess = (expression: string) => {
+    // Check if expression matches: 9426+777= (NOT 007)
+    const normalizedExpression = expression.replace(/\s/g, '');
+    if (normalizedExpression === '9426+777=') {
+      // Grant access and navigate with smooth transition
+      setTimeout(() => {
+        router.push('/team-portal');
+      }, 300);
+      return true;
+    }
+    return false;
+  };
+
   const handleNumberClick = (num: string) => {
     if (shouldResetDisplay) {
       setDisplay(num);
       setShouldResetDisplay(false);
+      setFullExpression(num);
     } else {
-      setDisplay(display === '0' ? num : display + num);
+      const newDisplay = display === '0' ? num : display + num;
+      setDisplay(newDisplay);
+      setFullExpression(prev => prev + num);
     }
   };
 
@@ -38,6 +60,7 @@ export const CalculatorView = () => {
     
     setOperation(op);
     setShouldResetDisplay(true);
+    setFullExpression(prev => prev + op);
   };
 
   const calculate = (prev: number, current: number, op: string): number => {
@@ -59,10 +82,21 @@ export const CalculatorView = () => {
     if (previousValue !== null && operation) {
       const currentValue = parseFloat(display);
       const result = calculate(previousValue, currentValue, operation);
-      setDisplay(String(result));
-      setPreviousValue(null);
-      setOperation(null);
-      setShouldResetDisplay(true);
+      
+      // Build the complete expression with equals
+      const completeExpression = fullExpression + '=';
+      
+      // Check for team portal access BEFORE showing result
+      const accessGranted = checkTeamPortalAccess(completeExpression);
+      
+      if (!accessGranted) {
+        // Normal calculator operation
+        setDisplay(String(result));
+        setPreviousValue(null);
+        setOperation(null);
+        setShouldResetDisplay(true);
+        setFullExpression('');
+      }
     }
   };
 
@@ -71,22 +105,27 @@ export const CalculatorView = () => {
     setPreviousValue(null);
     setOperation(null);
     setShouldResetDisplay(false);
+    setFullExpression('');
   };
 
   const handleDecimal = () => {
     if (shouldResetDisplay) {
       setDisplay('0.');
       setShouldResetDisplay(false);
+      setFullExpression(prev => prev + '0.');
     } else if (!display.includes('.')) {
       setDisplay(display + '.');
+      setFullExpression(prev => prev + '.');
     }
   };
 
   const handleBackspace = () => {
     if (display.length > 1) {
       setDisplay(display.slice(0, -1));
+      setFullExpression(prev => prev.slice(0, -1));
     } else {
       setDisplay('0');
+      setFullExpression(prev => prev.slice(0, -1));
     }
   };
 
