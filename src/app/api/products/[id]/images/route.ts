@@ -1,7 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { productImages } from '@/db/schema';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, asc } from 'drizzle-orm';
+
+export async function GET(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await context.params;
+    
+    // Validate id
+    if (!id || isNaN(parseInt(id))) {
+      return NextResponse.json(
+        { error: 'Valid product ID is required', code: 'INVALID_PRODUCT_ID' },
+        { status: 400 }
+      );
+    }
+
+    const productId = parseInt(id);
+
+    // Fetch all images for the product
+    const images = await db
+      .select()
+      .from(productImages)
+      .where(eq(productImages.productId, productId))
+      .orderBy(asc(productImages.displayOrder));
+
+    return NextResponse.json(images, { status: 200 });
+  } catch (error) {
+    console.error('GET error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error: ' + (error as Error).message },
+      { status: 500 }
+    );
+  }
+}
 
 export async function POST(
   request: NextRequest,

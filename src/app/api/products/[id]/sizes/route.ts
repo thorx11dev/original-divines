@@ -3,6 +3,45 @@ import { db } from '@/db';
 import { productSizes, products } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 
+export async function GET(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await context.params;
+    
+    // Validate id is valid integer
+    if (!id || isNaN(parseInt(id))) {
+      return NextResponse.json(
+        { 
+          error: "Valid product ID is required",
+          code: "INVALID_PRODUCT_ID" 
+        },
+        { status: 400 }
+      );
+    }
+
+    const productIdInt = parseInt(id);
+
+    // Fetch all sizes for the product
+    const sizes = await db
+      .select()
+      .from(productSizes)
+      .where(eq(productSizes.productId, productIdInt));
+
+    return NextResponse.json(sizes, { status: 200 });
+
+  } catch (error) {
+    console.error('GET error:', error);
+    return NextResponse.json(
+      { 
+        error: 'Internal server error: ' + (error as Error).message 
+      },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
