@@ -5,41 +5,65 @@ import { usePathname } from 'next/navigation';
 
 export const LoadingScreen = () => {
   const pathname = usePathname();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [progress, setProgress] = useState(0);
-  const [previousPath, setPreviousPath] = useState(pathname);
+  const [shouldRender, setShouldRender] = useState(true);
 
   useEffect(() => {
-    // Detect path change and show loading IMMEDIATELY
-    if (pathname !== previousPath) {
-      setIsLoading(true);
-      setProgress(0);
-      setPreviousPath(pathname);
+    // Show loading screen immediately
+    setIsLoading(true);
+    setProgress(0);
 
-      // Simulate loading progress
-      const progressInterval = setInterval(() => {
-        setProgress(prev => {
-          if (prev >= 100) {
-            clearInterval(progressInterval);
-            return 100;
-          }
-          return prev + 10;
-        });
-      }, 100);
+    let progressInterval: NodeJS.Timeout;
+    let completeTimeout: NodeJS.Timeout;
 
-      // Complete loading after progress reaches 100%
-      const loadingTimeout = setTimeout(() => {
-        setIsLoading(false);
-      }, 1200);
+    // Smooth progress animation
+    progressInterval = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 90) {
+          clearInterval(progressInterval);
+          return 90; // Stop at 90% until page is ready
+        }
+        // Faster initial progress, slower as it approaches completion
+        const increment = prev < 50 ? 15 : prev < 80 ? 8 : 3;
+        return Math.min(prev + increment, 90);
+      });
+    }, 80);
 
-      return () => {
-        clearInterval(progressInterval);
-        clearTimeout(loadingTimeout);
-      };
-    }
-  }, [pathname, previousPath]);
+    // Wait for page to be interactive
+    const checkPageReady = () => {
+      if (document.readyState === 'complete') {
+        // Complete the progress
+        setProgress(100);
+        
+        // Hide loading screen after brief delay
+        completeTimeout = setTimeout(() => {
+          setIsLoading(false);
+          
+          // Remove from DOM after fade out
+          setTimeout(() => {
+            setShouldRender(false);
+          }, 500);
+        }, 200);
+      } else {
+        // Check again
+        setTimeout(checkPageReady, 50);
+      }
+    };
 
-  if (!isLoading && progress === 100) return null;
+    // Start checking when progress reaches 90%
+    const readyCheckTimeout = setTimeout(() => {
+      checkPageReady();
+    }, 800);
+
+    return () => {
+      clearInterval(progressInterval);
+      clearTimeout(completeTimeout);
+      clearTimeout(readyCheckTimeout);
+    };
+  }, [pathname]);
+
+  if (!shouldRender) return null;
 
   return (
     <div
@@ -69,7 +93,7 @@ export const LoadingScreen = () => {
 
         {/* Loading Text */}
         <div className="mt-[16px] text-[12px] text-grey-40 uppercase tracking-wider font-medium">
-          Loading... {progress}%
+          {progress < 100 ? `Loading... ${Math.round(progress)}%` : 'Ready!'}
         </div>
       </div>
     </div>
